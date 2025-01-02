@@ -41,9 +41,8 @@ export const setUsers = async () => {
 };
 
 
-// Function to set the authenticated user and update user state
+// Function to set the authenticated user and update user state. Setting access and refresh tokens in cookies with expiration dates
 export const setAuthUser = (access_token, refresh_token) => {
-    // Setting access and refresh tokens in cookies with expiration dates
     Cookies.set("access_token", access_token, {
         expires: 1, // Access token expires in 1 day
         secure: true,
@@ -57,8 +56,6 @@ export const setAuthUser = (access_token, refresh_token) => {
     // Decoding access token to get user information
     const user = jwtDecode(access_token) ?? null;
     
-   
-    // If user information is present, Dispatch the setUser action to update Redux state
     if (user) {
         setUser(user);
     }
@@ -68,26 +65,22 @@ export const setAuthUser = (access_token, refresh_token) => {
 };
 
 
-// Function to refresh the access token using the refresh token
+// Function to refresh the access token using the refresh token. Retrieving refresh token from cookies and making a POST request to refresh the access token
 export const getRefreshToken = async () => {
-    // Retrieving refresh token from cookies and making a POST request to refresh the access token
     const refresh_token = Cookies.get("refresh_token");
     const response = await axios.post("user/token/refresh/", {
         refresh: refresh_token,
     });
 
-    // Returning the refreshed access token
     return response.data;
 };
 
 // Function to check if the access token is expired
 export const isAccessTokenExpired = (accessToken) => {
     try {
-        // Decoding the access token and checking if it has expired
         const decodedToken = jwtDecode(accessToken);
         return decodedToken.exp < Date.now() / 1000;
     } catch (err) {
-        // Returning true if the token is invalid or expired
         return true;
     }
 };

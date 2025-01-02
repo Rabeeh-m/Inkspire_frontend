@@ -18,12 +18,11 @@ const useAxios = () => {
     axiosInstance.interceptors.request.use(async (req) => {
         // Check if the access token is expired. If not expired, return the original request
         if (!isAccessTokenExpired(accessToken)) {
-            return req; // 
+            return req; 
         }
 
         // If the access token is expired, refresh it
         const response = await getRefreshToken(refreshToken);
-        // console.log('Refresh Token Response:', response);
         // Update the application with the new access and refresh tokens
         setAuthUser(response.access, response.refresh);
 

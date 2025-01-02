@@ -112,6 +112,11 @@ function Header() {
                       <i className="fas fa-user-gear mr-2"></i> Profile
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/change-password" className="block px-4 py-2 hover:bg-gray-600">
+                      <i className="fas fa-user-gear mr-2"></i> Change Password
+                    </Link>
+                  </li>
                 </ul>
               </div>
             )}

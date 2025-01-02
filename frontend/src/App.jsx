@@ -7,7 +7,12 @@ import Category from "./views/core/Category";
 import About from "./views/pages/About";
 import Contact from "./views/pages/Contact";
 import Register from "./views/auth/Register";
+import OTPVerification from "./views/auth/OTPVerification";
 import Login from "./views/auth/Login";
+import ForgotPassword from "./views/auth/ForgotPassword";
+import ResetPassword from "./views/auth/ResetPassword";
+import VerifyOTP from "./views/auth/VerifyOTP";
+import ChangePassword from "./views/auth/ChangePassword";
 import Dashboard from "./views/dashboard/Dashboard";
 import Posts from "./views/dashboard/Posts";
 import AddPost from "./views/dashboard/AddPost";
@@ -16,8 +21,6 @@ import Comments from "./views/dashboard/Comments";
 import Notifications from "./views/dashboard/Notifications";
 import Profile from "./views/dashboard/Profile";
 import PrivateRoute from "./layouts/PrivateRoute";
-
-import OTPVerification from "./views/auth/OTPVerification";
 
 import AdminLogin from "./views/admin/AdminLogin";
 import AdminDashboard from "./views/admin/AdminDashboard";
@@ -38,6 +41,11 @@ function App() {
                         <Route path="/register/" element={<Register />} />
                         <Route path="/otp-verification/" element={<OTPVerification />} />
                         <Route path="/login/" element={<Login />} />
+                        
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/verify-otp" element={<VerifyOTP/>} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/change-password" element={<ChangePassword />} />
 
                         {/* Dashboard */}
                         <Route path="/dashboard/" element={
