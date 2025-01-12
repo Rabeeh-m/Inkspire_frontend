@@ -26,7 +26,12 @@ function OTPVerification() {
     const handleOtpSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("user/verify-otp/", { email, otp, full_name, password });
+            const response = await axios.post("user/verify-otp/", {
+                email,
+                otp,
+                full_name,
+                password,
+            });
             Swal.fire({
                 icon: "success",
                 title: "Verification Successful",
@@ -45,7 +50,12 @@ function OTPVerification() {
     const resendOtp = async () => {
         setIsResending(true);
         try {
-            await axios.post("user/register/", { full_name, email, password, password2: password });
+            await axios.post("user/register/", {
+                full_name,
+                email,
+                password,
+                password2: password,
+            });
             Swal.fire({
                 icon: "success",
                 title: "OTP Resent",
@@ -66,13 +76,19 @@ function OTPVerification() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
             <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-                <h1 className="text-2xl font-bold mb-4 text-center">OTP Verification</h1>
+                <h1 className="text-2xl font-bold mb-4 text-center">
+                    OTP Verification
+                </h1>
                 <p className="text-sm text-center mb-6">
-                    Enter the OTP sent to your email. Time remaining: <strong>{timer} seconds</strong>
+                    Enter the OTP sent to your email. Time remaining:{" "}
+                    <strong>{timer} seconds</strong>
                 </p>
                 <form onSubmit={handleOtpSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                        <label
+                            htmlFor="otp"
+                            className="block text-sm font-medium text-gray-700"
+                        >
                             OTP
                         </label>
                         <input

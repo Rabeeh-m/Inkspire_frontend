@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../partials/Header";
@@ -8,7 +7,12 @@ import Swal from "sweetalert2";
 import apiInstance from "../../utils/axios";
 
 function Register() {
-    const [bioData, setBioData] = useState({ full_name: "", email: "", password: "", password2: "" });
+    const [bioData, setBioData] = useState({
+        full_name: "",
+        email: "",
+        password: "",
+        password2: "",
+    });
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -43,19 +47,27 @@ function Register() {
             Swal.fire({
                 icon: "success",
                 title: "Registration Successful",
-                text: response.data?.message || "You have successfully registered.",
+                text:
+                    response.data?.message ||
+                    "You have successfully registered.",
             });
 
             resetForm();
             // navigate("/login/");
-            navigate("/otp-verification/", { state: { email: bioData.email, full_name: bioData.full_name, password: bioData.password } });
-
-
+            navigate("/otp-verification/", {
+                state: {
+                    email: bioData.email,
+                    full_name: bioData.full_name,
+                    password: bioData.password,
+                },
+            });
         } catch (error) {
             Swal.fire({
                 icon: "error",
                 title: "Registration Failed",
-                text: error.response?.data?.error || "Something went wrong. Please try again.",
+                text:
+                    error.response?.data?.error ||
+                    "Something went wrong. Please try again.",
             });
         } finally {
             setIsLoading(false);
@@ -67,16 +79,24 @@ function Register() {
             <Header />
             <main className="flex-grow flex items-center justify-center">
                 <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-4">Sign Up</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 mb-4">
+                        Sign Up
+                    </h1>
                     <p className="text-sm text-gray-600 mb-6">
                         Already have an account?{" "}
-                        <Link to="/login/" className="text-blue-600 hover:underline">
+                        <Link
+                            to="/login/"
+                            className="text-blue-600 hover:underline"
+                        >
                             Sign In
                         </Link>
                     </p>
                     <form onSubmit={handleRegister}>
                         <div className="mb-4">
-                            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="full_name"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Full Name
                             </label>
                             <input
@@ -91,7 +111,10 @@ function Register() {
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="email"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Email Address
                             </label>
                             <input
@@ -106,7 +129,10 @@ function Register() {
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="password"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Password
                             </label>
                             <input
@@ -121,7 +147,10 @@ function Register() {
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="password2" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="password2"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Confirm Password
                             </label>
                             <input
@@ -139,7 +168,9 @@ function Register() {
                             type="submit"
                             disabled={isLoading}
                             className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                                isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                                isLoading
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700"
                             }`}
                         >
                             {isLoading ? (

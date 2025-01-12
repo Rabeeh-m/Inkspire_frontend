@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../partials/Header";
@@ -6,7 +5,7 @@ import Footer from "../partials/Footer";
 import { useDispatch } from "react-redux";
 import { setUser, setLoading } from "../../store/authSlice";
 import axios from "../../utils/axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 
@@ -40,7 +39,10 @@ function Login() {
 
     const setAuthUser = (accessToken, refreshToken) => {
         Cookies.set("access_token", accessToken, { expires: 1, secure: true });
-        Cookies.set("refresh_token", refreshToken, { expires: 7, secure: true });
+        Cookies.set("refresh_token", refreshToken, {
+            expires: 7,
+            secure: true,
+        });
 
         const user = jwtDecode(accessToken) ?? null;
         if (user) {
@@ -90,17 +92,25 @@ function Login() {
             <Header />
             <section className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-12">
                 <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-                    <h1 className="text-2xl font-bold mb-4 text-center">Sign in</h1>
+                    <h1 className="text-2xl font-bold mb-4 text-center">
+                        Sign in
+                    </h1>
                     <p className="text-sm text-center mb-6">
                         Don’t have an account?{" "}
-                        <Link to="/register/" className="text-blue-600 hover:underline">
+                        <Link
+                            to="/register/"
+                            className="text-blue-600 hover:underline"
+                        >
                             Sign up
                         </Link>
                     </p>
                     <form onSubmit={handleLogin} className="space-y-6">
                         {/* Email */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="email"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Email Address
                             </label>
                             <input
@@ -116,7 +126,10 @@ function Login() {
                         </div>
                         {/* Password */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="password"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Password
                             </label>
                             <input
@@ -132,8 +145,10 @@ function Login() {
                         </div>
                         {/* Remember Me */}
                         <div className="flex items-center justify-between">
-                           
-                            <Link to="/forgot-password/" className="text-sm text-blue-600 hover:underline">
+                            <Link
+                                to="/forgot-password/"
+                                className="text-sm text-blue-600 hover:underline"
+                            >
                                 Forgot your password?
                             </Link>
                         </div>
@@ -143,7 +158,9 @@ function Login() {
                                 type="submit"
                                 disabled={isLoading}
                                 className={`w-full flex items-center justify-center px-4 py-2 text-white font-medium rounded-lg transition ${
-                                    isLoading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                                    isLoading
+                                        ? "bg-blue-300 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700"
                                 }`}
                             >
                                 {isLoading ? (

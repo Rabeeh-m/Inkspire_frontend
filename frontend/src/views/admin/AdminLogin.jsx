@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../partials/Header";
@@ -16,7 +14,10 @@ const AdminLogin = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await axios.post("/admin/token/", { email, password });
+            const response = await axios.post("/admin/token/", {
+                email,
+                password,
+            });
             const { access, refresh } = response.data;
             localStorage.setItem("access_token", access);
             localStorage.setItem("refresh_token", refresh);
@@ -33,12 +34,17 @@ const AdminLogin = () => {
             <Header />
             <section className="flex flex-col items-center justify-center min-h-screen bg-gray-50 py-12">
                 <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-                    <h1 className="text-2xl font-bold mb-4 text-center">Admin Sign in</h1>
-                    
+                    <h1 className="text-2xl font-bold mb-4 text-center">
+                        Admin Sign in
+                    </h1>
+
                     <form onSubmit={handleLogin} className="space-y-6">
                         {/* Email */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="email"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Email Address
                             </label>
                             <input
@@ -53,7 +59,10 @@ const AdminLogin = () => {
                         </div>
                         {/* Password */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="password"
+                                className="block text-sm font-medium text-gray-700"
+                            >
                                 Password
                             </label>
                             <input
@@ -66,14 +75,16 @@ const AdminLogin = () => {
                                 required
                             />
                         </div>
-                        
+
                         {/* Submit */}
                         <div>
                             <button
                                 type="submit"
                                 disabled={isLoading}
                                 className={`w-full flex items-center justify-center px-4 py-2 text-white font-medium rounded-lg transition ${
-                                    isLoading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                                    isLoading
+                                        ? "bg-blue-300 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700"
                                 }`}
                             >
                                 {isLoading ? (
@@ -106,7 +117,11 @@ const AdminLogin = () => {
                             </button>
                         </div>
                     </form>
-                    {error && <p className="mt-4 text-sm text-red-500 text-center">{error}</p>}
+                    {error && (
+                        <p className="mt-4 text-sm text-red-500 text-center">
+                            {error}
+                        </p>
+                    )}
                 </div>
             </section>
             <Footer />

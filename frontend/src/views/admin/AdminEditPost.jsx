@@ -69,13 +69,12 @@ const AdminEditPost = () => {
         reader.onloadend = () => {
             setImagePreview(reader.result);
         };
-    
+
         if (selectedFile) {
             setPost({ ...post, image: selectedFile });
             reader.readAsDataURL(selectedFile);
         }
     };
-    
 
     // Update Post
     const handleUpdatePost = async (e) => {
@@ -107,19 +106,25 @@ const AdminEditPost = () => {
 
     return (
         <>
-            <AdminHeader/>
+            <AdminHeader />
             <section className="pt-5 pb-5">
                 <div className="container mx-auto px-4">
                     <div className="bg-blue-600 text-white rounded-lg p-6 mb-5">
                         <h1 className="text-2xl font-bold">Edit Post</h1>
-                        <p className="text-sm">Admin: Update post details below.</p>
+                        <p className="text-sm">
+                            Admin: Update post details below.
+                        </p>
                     </div>
                     <form onSubmit={handleUpdatePost}>
                         <div className="bg-white border-2 border-gray-400 rounded-lg shadow-md p-6">
-                            <h4 className="text-lg font-medium mb-4">Edit Post Information</h4>
+                            <h4 className="text-lg font-medium mb-4">
+                                Edit Post Information
+                            </h4>
 
                             <div className="mb-4">
-                                <label className="block font-medium mb-2">Thumbnail</label>
+                                <label className="block font-medium mb-2">
+                                    Thumbnail
+                                </label>
                                 <img
                                     src={imagePreview || post.thumbnail_image}
                                     alt="Post Thumbnail"
@@ -135,7 +140,9 @@ const AdminEditPost = () => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block font-medium mb-2">Title</label>
+                                <label className="block font-medium mb-2">
+                                    Title
+                                </label>
                                 <input
                                     type="text"
                                     name="title"
@@ -146,7 +153,9 @@ const AdminEditPost = () => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block font-medium mb-2">Category</label>
+                                <label className="block font-medium mb-2">
+                                    Category
+                                </label>
                                 <select
                                     name="category"
                                     value={post.category}
@@ -163,7 +172,9 @@ const AdminEditPost = () => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block font-medium mb-2">Content</label>
+                                <label className="block font-medium mb-2">
+                                    Content
+                                </label>
                                 <textarea
                                     name="content"
                                     value={post.content}
@@ -174,7 +185,9 @@ const AdminEditPost = () => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block font-medium mb-2">Tags</label>
+                                <label className="block font-medium mb-2">
+                                    Tags
+                                </label>
                                 <input
                                     type="text"
                                     name="tags"
@@ -185,7 +198,9 @@ const AdminEditPost = () => {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block font-medium mb-2">Status</label>
+                                <label className="block font-medium mb-2">
+                                    Status
+                                </label>
                                 <select
                                     name="status"
                                     value={post.status}
@@ -202,14 +217,17 @@ const AdminEditPost = () => {
                         <button
                             type="submit"
                             className={`w-full py-2 px-4 mt-4 rounded-lg text-white font-medium ${
-                                isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                                isLoading
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700"
                             }`}
                             disabled={isLoading}
                         >
                             {isLoading ? "Updating..." : "Update Post"}
                         </button>
                     </form>
-                    <Link to={'/admin/post-management'}
+                    <Link
+                        to={"/admin/post-management"}
                         className="mt-4 block text-center text-blue-600 hover:underline"
                     >
                         Back to Posts Management

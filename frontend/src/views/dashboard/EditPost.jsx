@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
@@ -9,8 +8,36 @@ import useUserData from "../../plugin/useUserData";
 import Toast from "../../plugin/Toast";
 import Swal from "sweetalert2";
 
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+const modules = {
+    toolbar: [
+        [{ header: [1, 2, 3, 4, 5, 6, false] }], // Headers
+        [{ font: [] }], // Font selection
+        [{ size: ["small", false, "large", "huge"] }], // Font sizes
+
+        // Text Formatting
+        ["bold", "italic", "underline", "strike"], // Bold, Italic, Underline, Strikethrough
+        [{ color: [] }, { background: [] }], // Text and background colors
+        [{ script: "sub" }, { script: "super" }], // Subscript/Superscript
+
+        // Alignment and Indentation
+        [{ list: "ordered" }, { list: "bullet" }], // Ordered and Bullet lists
+        [{ indent: "-1" }, { indent: "+1" }], // Indentation
+        [{ align: [] }], // Text alignment
+    ],
+};
+
 function EditPost() {
-    const [post, setEditPost] = useState({ image: "", title: "", content: "", category: parseInt(""), tags: "", status: "" });
+    const [post, setEditPost] = useState({
+        image: "",
+        title: "",
+        content: "",
+        category: parseInt(""),
+        tags: "",
+        status: "",
+    });
     const [imagePreview, setImagePreview] = useState("");
     const [categoryList, setCategoryList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +46,9 @@ function EditPost() {
     const param = useParams();
 
     const fetchPost = async () => {
-        const response = await apiInstance.get(`author/dashboard/post-detail/${userId}/${param.id}/`);
+        const response = await apiInstance.get(
+            `author/dashboard/post-detail/${userId}/${param.id}/`
+        );
         setEditPost(response.data);
     };
 
@@ -27,6 +56,7 @@ function EditPost() {
         const response = await apiInstance.get(`post/category/list/`);
         setCategoryList(response.data);
     };
+
     useEffect(() => {
         fetchCategory();
         fetchPost();
@@ -77,11 +107,15 @@ function EditPost() {
         formdata.append("category", post.category.id);
         formdata.append("post_status", post.status);
         try {
-            const response = await apiInstance.patch(`author/dashboard/post-detail/${userId}/${param.id}/`, formdata, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await apiInstance.patch(
+                `author/dashboard/post-detail/${userId}/${param.id}/`,
+                formdata,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
             setIsLoading(false);
             Swal.fire({
                 icon: "success",
@@ -93,6 +127,13 @@ function EditPost() {
         }
     };
 
+    const handleContentChange = (value) => {
+        setEditPost({
+            ...post,
+            content: value,
+        });
+    };
+
     return (
         <>
             <Header />
@@ -102,36 +143,56 @@ function EditPost() {
                         <div className="bg-blue-600 text-white rounded-lg p-6">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h1 className="text-2xl font-bold">Update Blog Post</h1>
-                                    <p className="text-sm">Use the article builder below to update your article.</p>
+                                    <h1 className="text-2xl font-bold">
+                                        Update Blog Post
+                                    </h1>
+                                    <p className="text-sm">
+                                        Use the article builder below to update
+                                        your article.
+                                    </p>
                                 </div>
                                 <div className="flex space-x-4">
-                                    <Link to="/posts/" className="btn bg-white text-blue-600 font-medium py-2 px-4 rounded-lg">
-                                        <i className="fas fa-arrow-left mr-2"></i>Back to Posts
+                                    <Link
+                                        to="/posts/"
+                                        className="btn bg-white text-blue-600 font-medium py-2 px-4 rounded-lg"
+                                    >
+                                        <i className="fas fa-arrow-left mr-2"></i>
+                                        Back to Posts
                                     </Link>
                                 </div>
                             </div>
                         </div>
                         <form onSubmit={handleCreatePost} className="mt-5">
                             <div className="bg-white border-2 border-gray-400 rounded-lg shadow-md p-6">
-                                <h4 className="text-lg font-medium mb-4">Basic Information</h4>
+                                <h4 className="text-lg font-medium mb-4">
+                                    Basic Information
+                                </h4>
                                 <div className="mb-4">
-                                    <label htmlFor="postThumbnail" className="block font-medium mb-2">Preview</label>
+                                    <label
+                                        htmlFor="postThumbnail"
+                                        className="block font-medium mb-2"
+                                    >
+                                        Preview
+                                    </label>
                                     <img
                                         className="w-full border-2 border-gray-400 h-80 object-cover rounded-lg mb-4"
-                                        src={imagePreview || post.thumbnail_image}
+                                        src={
+                                            imagePreview || post.thumbnail_image
+                                        }
                                         alt="Post Thumbnail Preview"
                                     />
                                     <input
                                         onChange={handleFileChange}
                                         name="image"
                                         id="postThumbnail"
-                                        className="block w-full  text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                                        className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                                         type="file"
                                     />
                                 </div>
                                 <div className="mb-4">
-                                    <label className="block font-medium mb-2">Title</label>
+                                    <label className="block font-medium mb-2">
+                                        Title
+                                    </label>
                                     <input
                                         value={post.title}
                                         onChange={handleCreatePostChange}
@@ -142,7 +203,9 @@ function EditPost() {
                                     />
                                 </div>
                                 <div className="mb-4">
-                                    <label className="block font-medium mb-2">Posts Category</label>
+                                    <label className="block font-medium mb-2">
+                                        Posts Category
+                                    </label>
                                     <select
                                         name="category"
                                         value={post.category?.id}
@@ -151,22 +214,27 @@ function EditPost() {
                                     >
                                         <option value="">-------------</option>
                                         {categoryList?.map((c) => (
-                                            <option key={c?.id} value={c?.id}>{c?.title}</option>
+                                            <option key={c?.id} value={c?.id}>
+                                                {c?.title}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
                                 <div className="mb-4">
-                                    <label className="block font-medium mb-2">Post Content</label>
-                                    <textarea
+                                    <label className="block font-medium mb-2">
+                                        Post Content
+                                    </label>
+                                    <ReactQuill
                                         value={post.content}
-                                        onChange={handleCreatePostChange}
-                                        name="content"
-                                        className="w-full px-4 py-2 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
-                                        rows="6"
-                                    ></textarea>
+                                        onChange={handleContentChange}
+                                        modules={modules}
+                                        placeholder="Write your post content here..."
+                                    />
                                 </div>
                                 <div className="mb-4">
-                                    <label className="block font-medium mb-2">Tags</label>
+                                    <label className="block font-medium mb-2">
+                                        Tags
+                                    </label>
                                     <input
                                         value={post.tags}
                                         onChange={handleCreatePostChange}
@@ -177,16 +245,22 @@ function EditPost() {
                                     />
                                 </div>
                                 <div className="mb-4">
-                                    <label className="block font-medium mb-2">Status</label>
+                                    <label className="block font-medium mb-2">
+                                        Status
+                                    </label>
                                     <select
                                         value={post.status}
                                         onChange={handleCreatePostChange}
                                         name="status"
                                         className="w-full px-4 py-2 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                                     >
-                                        <option value="Published">Published</option>
+                                        <option value="Published">
+                                            Published
+                                        </option>
                                         <option value="Draft">Draft</option>
-                                        <option value="Disabled">Disabled</option>
+                                        <option value="Disabled">
+                                            Disabled
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -203,7 +277,8 @@ function EditPost() {
                                     className="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-lg mt-4 hover:bg-blue-700"
                                     type="submit"
                                 >
-                                    Update Post <i className="fas fa-check-circle ml-2"></i>
+                                    Update Post{" "}
+                                    <i className="fas fa-check-circle ml-2"></i>
                                 </button>
                             )}
                         </form>

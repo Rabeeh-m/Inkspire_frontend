@@ -1,320 +1,394 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import apiInstance from "../../utils/axios";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
-import Moment,{timeAgo} from "../../plugin/Moment";
-import Toast from "../../plugin/Toast"
+import Moment, { timeAgo } from "../../plugin/Moment";
+import Toast from "../../plugin/Toast";
+import useUserData from "../../plugin/useUserData";
 
 import {
-  FaHeart,
-  FaRegHeart,
-  FaBookmark,
-  FaRegBookmark,
-  FaShareAlt,
-  FaCommentDots,
+    FaHeart,
+    FaRegHeart,
+    FaBookmark,
+    FaRegBookmark,
+    FaShareAlt,
 } from "react-icons/fa";
 
 const Detail = () => {
-  const [post, setPost] = useState(null);
-  const [tags, setTags] = useState([]);
+    const [post, setPost] = useState(null);
+    const [tags, setTags] = useState([]);
+    const [liked, setLiked] = useState(false);
+    const [bookmarked, setBookmarked] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState("");
 
-  const [createComment, setCreateComment] = useState({
-    full_name: "",
-    email: "",
-    comment: "",
-  });
+    const [replyContent, setReplyContent] = useState("");
+    const [activeReply, setActiveReply] = useState(null);
 
-  const [liked, setLiked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+    const param = useParams(); // Get post slug from URL
 
-  const param = useParams(); // Get article slug from the URL
+    const userId = useUserData()?.user_id;
 
-  const fetchPost = async () => {
-    try {
-      const response = await apiInstance.get(`post/detail/${param.slug}/`);
-      setPost(response.data);
-      const tagArray = response?.data?.tags?.split(",");
-      setTags(tagArray || []);
-    } catch (error) {
-      console.error("Error fetching article:", error);
-      setPost(null);
-    }
-  };
-
-
-
-  const handleLikePost = async () => {
-    setLiked((prev) => !prev);
-    
-    const jsonData = {
-      user_id:2,
-      post_id: post?.id
-    }
-
-    const response = await apiInstance.post('post/like-post/', jsonData)
-    console.log(response.data);
-    // Toast("success", response.data.message)
-    fetchPost()
-  };
-
-  const handleBookmarkPost = async () => {
-    setBookmarked((prev) => !prev);
-    
-    const jsonData = {
-      user_id:2,
-      post_id: post?.id
-    }
-
-    const response = await apiInstance.post('post/bookmark-post/', jsonData)
-    console.log(response.data);
-    Toast("success", response.data.message)
-    fetchPost()
-  };
-
-  
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("Link copied to clipboard!");
-  };
-
-  useEffect(() => {
-    fetchPost();
-  }, []);
-
-  const handleCreateCommentChange = (event) => {
-    setCreateComment({
-      ...createComment,
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  const handleCreateCommentSubmit = async (e) => {
-    e.preventDefault();
-
-    const jsonData = {
-      post_id: post?.id,
-      name: createComment.full_name,
-      email: createComment.email,
-      comment: createComment.comment,
+    // Fetch Post and Comments
+    const fetchPost = async () => {
+        try {
+            const response = await apiInstance.get(
+                `post/detail/${param.slug}/`
+            );
+            setPost(response.data);
+            setComments(response.data.comments || []);
+            const tagArray = response?.data?.tags?.split(",");
+            setTags(tagArray || []);
+        } catch (error) {
+            console.error("Error fetching post:", error);
+            setPost(null);
+        }
     };
 
-    const response = await apiInstance.post(`post/comment-post/`, jsonData);
-    console.log(response);
-    fetchPost();
-    Toast("success", "Comment Posted.", "");
-    setCreateComment({
-      full_name: "",
-      email: "",
-      comment: "",
-    });
-  };
+    // Like Post
+    const handleLikePost = async () => {
+        setLiked((prev) => !prev);
+        const response = await apiInstance.post("post/like-post/", {
+            user_id: userId,
+            post_id: post?.id,
+        });
+        Toast("success", response.data.message);
+        fetchPost();
+    };
 
-  if (!post) {
+    // Bookmark Post
+    const handleBookmarkPost = async () => {
+        setBookmarked((prev) => !prev);
+        const response = await apiInstance.post("post/bookmark-post/", {
+            user_id: userId,
+            post_id: post?.id,
+        });
+        Toast("success", response.data.message);
+        fetchPost();
+    };
+
+    // Share Post
+    const handleShare = () => {
+        navigator.clipboard.writeText(window.location.href);
+        Toast("success", "Link copied to clipboard!");
+    };
+
+    // Post New Comment
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await apiInstance.post("post/comment-post/", {
+                post_id: post.id,
+                user_id: userId,
+                comment: newComment,
+            });
+            setNewComment("");
+            Toast("success", response.data.message);
+            fetchPost();
+        } catch (error) {
+            console.error("Error posting comment:", error);
+        }
+    };
+
+    // Like/Unlike a Comment
+    const handleCommentLike = async (commentId) => {
+        try {
+            const response = await apiInstance.post("post/like-comment/", {
+                comment_id: commentId,
+                user_id: userId,
+            });
+            Toast("success", response.data.message);
+            fetchPost();
+        } catch (error) {
+            console.error("Error liking comment:", error);
+        }
+    };
+
+    // Reply to Comment
+    const handleReplySubmit = async (e, parentId) => {
+        e.preventDefault();
+        if (!replyContent.trim()) {
+            Toast("error", "Reply content cannot be empty!");
+            return;
+        }
+
+        const payload = {
+            comment_id: parentId,
+            user_id: userId, // Ensure this is fetched from your authentication context
+            comment: replyContent.trim(),
+        };
+
+        try {
+            const response = await apiInstance.post(
+                "post/reply-comment/",
+                payload
+            );
+            setReplyContent(""); // Clear input
+            setActiveReply(null); // Collapse reply input
+            Toast(
+                "success",
+                response.data.message || "Reply posted successfully."
+            );
+            fetchPost(); // Refresh post and comments data
+        } catch (error) {
+            console.error(
+                "Error replying to comment:",
+                error.response?.data || error.message
+            );
+            Toast(
+                "error",
+                error.response?.data?.error ||
+                    "Failed to post the reply. Please try again."
+            );
+        }
+    };
+
+    useEffect(() => {
+        fetchPost();
+    }, []);
+
+    if (!post) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
+        <section className="min-h-screen bg-gray-50">
+            <Header />
+
+            <div className="container mx-auto py-6 grid grid-cols-12 gap-6">
+                {/* Left Sidebar - Author Details */}
+                <aside className="col-span-12 lg:col-span-3 bg-white shadow-md rounded-lg p-6">
+                    <div className="text-center">
+                        <img
+                            src={post?.profile?.profile_image}
+                            alt="Author"
+                            className="w-24 h-24 rounded-full mx-auto object-cover shadow-md"
+                        />
+                        <h2 className="text-xl font-bold text-gray-800 mt-4">
+                            {post?.profile?.full_name}
+                        </h2>
+                        <p className="text-gray-600 text-sm">
+                            {post?.profile?.bio}
+                        </p>
+                    </div>
+                    <hr className="my-6" />
+                    <div className="text-gray-700 space-y-3">
+                        <p>
+                            <span className="font-bold">Email:</span>{" "}
+                            {post?.user?.email}
+                        </p>
+                        <p>
+                            <span className="font-bold">Joined:</span>{" "}
+                            {Moment(post?.profile?.created_at)}
+                        </p>
+                        <p>
+                            <span className="font-bold">Views:</span>{" "}
+                            {post?.views}
+                        </p>
+                        <p>
+                            <span className="font-bold">Likes:</span>{" "}
+                            {post?.likes?.length}
+                        </p>
+                    </div>
+                </aside>
+
+                {/* Main Article Section */}
+                <main className="col-span-12 lg:col-span-9 bg-white shadow-md rounded-lg p-8">
+                    <div className="mb-6">
+                        <h1 className="text-4xl font-bold text-gray-800">
+                            {post.title}
+                        </h1>
+                        <p className="text-gray-500 mt-2">
+                            Published on {Moment(post.created_at)}
+                        </p>
+                    </div>
+
+                    <div className="relative mb-8">
+                        <img
+                            src={post.thumbnail_image}
+                            alt="Article Thumbnail"
+                            className="w-full h-80 object-cover rounded-lg shadow-md"
+                        />
+                    </div>
+
+                    <div
+                        className="prose lg:prose-lg max-w-none"
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                    />
+
+                    <hr className="my-8" />
+
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                            Tags
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                            {tags?.map((tag, index) => (
+                                <span
+                                    key={index}
+                                    className="bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm hover:bg-gray-300 transition"
+                                >
+                                    #{tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    <hr className="my-8" />
+
+                    <div className="flex items-center gap-6 text-gray-700 text-lg">
+                        <button
+                            onClick={handleLikePost}
+                            className="flex items-center gap-2"
+                        >
+                            {liked ? (
+                                <FaHeart className="text-red-500" />
+                            ) : (
+                                <FaRegHeart />
+                            )}
+                            {post?.likes?.length}
+                        </button>
+                        <button
+                            onClick={handleBookmarkPost}
+                            className="flex items-center gap-2"
+                        >
+                            {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
+                            {bookmarked ? "Bookmarked" : "Bookmark"}
+                        </button>
+                        <button
+                            onClick={handleShare}
+                            className="flex items-center gap-2"
+                        >
+                            <FaShareAlt />
+                            Share
+                        </button>
+                    </div>
+
+                    <hr className="my-8" />
+
+                    {/* Comments Section */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            Comments
+                        </h2>
+
+                        <div className="mt-4">
+                            {comments.map((comment) => (
+                                <div
+                                    key={comment.id}
+                                    className="mb-6 p-5 border-2 border-gray-200 rounded-lg"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-gray-800 font-bold">
+                                                {comment?.user?.full_name}
+                                            </p>
+                                            <p className="text-gray-600 text-sm">
+                                                {timeAgo(comment.created_at)}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() =>
+                                                handleCommentLike(comment.id)
+                                            }
+                                            className="text-red-500 flex items-center gap-1"
+                                        >
+                                            <FaHeart /> {comment.like_count}
+                                        </button>
+                                    </div>
+                                    <p className="mt-2 text-gray-700">
+                                        {comment.comment}
+                                    </p>
+
+                                    {/* Reply Section */}
+                                    <button
+                                        className="text-blue-500 text-sm mt-2"
+                                        onClick={() =>
+                                            setActiveReply(
+                                                activeReply === comment.id
+                                                    ? null
+                                                    : comment.id
+                                            )
+                                        }
+                                    >
+                                        {activeReply === comment.id
+                                            ? "Cancel"
+                                            : "Reply"}
+                                    </button>
+
+                                    {activeReply === comment.id && (
+                                        <form
+                                            onSubmit={(e) =>
+                                                handleReplySubmit(e, comment.id)
+                                            }
+                                            className="mt-2"
+                                        >
+                                            <textarea
+                                                className="w-full border rounded-lg p-3"
+                                                placeholder="Write your reply..."
+                                                value={replyContent}
+                                                onChange={(e) =>
+                                                    setReplyContent(
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2"
+                                            >
+                                                Reply
+                                            </button>
+                                        </form>
+                                    )}
+
+                                    {/* Display Replies */}
+                                    {comment.replies?.map((reply) => (
+                                        <div
+                                            key={reply.id}
+                                            className="ml-6 mt-4"
+                                        >
+                                            <p className="text-gray-800 font-bold">
+                                                {reply?.user?.full_name}
+                                            </p>
+                                            <p className="text-gray-600 text-sm">
+                                                {timeAgo(reply.created_at)}
+                                            </p>
+                                            <p className="text-gray-700 mt-2">
+                                                {reply.comment}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+
+                        <form onSubmit={handleCommentSubmit} className="mt-6">
+                            <textarea
+                                className="w-full border rounded-lg p-3"
+                                placeholder="Write a comment..."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                            />
+                            <button
+                                type="submit"
+                                className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2"
+                            >
+                                Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </main>
+            </div>
+
+            <Footer />
+        </section>
     );
-  }
-
-  return (
-    <section className="min-h-screen bg-gray-50">
-      <Header />
-
-      <div className="container mx-auto py-6 grid grid-cols-12 gap-6">
-        {/* Left Sidebar - Author Details */}
-        <aside className="col-span-12 lg:col-span-3 bg-white shadow-md rounded-lg p-6">
-          <div className="text-center">
-            <img
-              src={post?.profile?.profile_image}
-              alt="Author"
-              className="w-24 h-24 rounded-full mx-auto object-cover shadow-md"
-            />
-            <h2 className="text-xl font-bold text-gray-800 mt-4">
-              {post?.profile?.full_name}
-            </h2>
-            <p className="text-gray-600 text-sm">{post?.profile?.bio}</p>
-          </div>
-          <hr className="my-6" />
-          <div className="text-gray-700 space-y-3">
-            <p className="flex items-center gap-2">
-              <span className="font-bold">Email:</span> {post?.user?.email}
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="font-bold">Joined:</span>{" "}
-              {Moment(post?.profile?.created_at)}
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="font-bold">Views:</span> {post?.views}
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="font-bold">Likes:</span> {post?.likes?.length}
-            </p>
-          </div>
-          <hr className="my-6" />
-        
-        </aside>
-
-        {/* Main Article Section */}
-        <main className="col-span-12 lg:col-span-9 bg-white shadow-md rounded-lg p-8">
-          <div className="mb-6">
-            <h1 className="text-4xl font-bold text-gray-800">
-              {post.title || "Title"}{" "}
-            </h1>
-            <p className="text-gray-500 mt-2">
-              Published on {Moment(post.created_at)}
-            </p>
-          </div>
-
-          <div className="relative mb-8">
-            <img
-              src={post.thumbnail_image}
-              alt="Article Thumbnail"
-              className="w-full h-80 object-cover rounded-lg shadow-md"
-            />
-          </div>
-
-          <div className="prose lg:prose-lg max-w-none">
-            <p>{post.content}</p>
-          </div>
-
-          <hr className="my-8" />
-
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Tags</h2>
-            <div className="flex flex-wrap gap-2">
-              {tags?.map((tag, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-200 text-gray-700 py-1 px-3 rounded-md text-sm hover:bg-gray-300 transition"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Like, Bookmark, Share, and Comments */}
-          <hr className="my-8" />
-
-          <div className="flex items-center gap-6 text-gray-700 text-lg">
-            <button onClick={handleLikePost} className="flex items-center gap-2">
-              {liked ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
-              {/* {liked ? "Liked" : "Like"} */}
-              {post ?. likes ?.length}
-            </button>
-
-            <button
-              onClick={handleBookmarkPost}
-              className="flex items-center gap-2"
-            >
-              {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
-              {bookmarked ? "Bookmarked" : "Bookmark"}
-            </button>
-
-            <button onClick={handleShare} className="flex items-center gap-2">
-              <FaShareAlt />
-              Share
-            </button>
-          </div>
-
-          <hr className="my-8" />
-
-          <div>
-            {/* Comments Section */}
-            <h3 className="text-lg font-semibold mb-4">
-              {post?.comments?.length} comments
-            </h3>
-            {post?.comments?.map((c, index) => (
-              <div
-                key={index}
-                className="my-4 flex bg-gray-100 p-4 mb-4 rounded-lg shadow-md"
-              >
-                {/* <img
-                  className="w-16 h-16 object-cover rounded-full mr-4"
-                  src="https://as1.ftcdn.net/v2/jpg/03/53/11/00/1000_F_353110097_nbpmfn9iHlxef4EDIhXB1tdTD0lcWhG9.jpg"
-                  alt="avatar"
-                /> */}
-                <div>
-                  <div className="mb-2">
-                    <h5 className="font-bold text-gray-800 m-0">{c?.name}</h5>
-                    <span className="text-sm text-gray-400">
-                      {timeAgo(c?.created_at)}
-                    </span>
-                  </div>
-                  <p className="font-medium text-gray-700">{c.comment}</p>
-
-                  <p className="text-sm text-gray-600 mt-1">{c.reply}</p>
-                </div>
-              </div>
-            ))}
-
-            {/* Reply Form */}
-            <div className="bg-gray-100 p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-bold mb-2">Leave a reply</h3>
-              <small className="text-gray-500">
-                Your email address will not be published. Required fields are
-                marked *
-              </small>
-              <form className="grid grid-cols-1 gap-4 mt-4" onSubmit={handleCreateCommentSubmit}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Name *
-                    </label>
-                    <input
-                      onChange={handleCreateCommentChange}
-                      name="full_name"
-                      value={createComment.full_name}
-                      type="text"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email *
-                    </label>
-                    <input
-                      onChange={handleCreateCommentChange}
-                      name="email"
-                      value={createComment.email}
-                      type="email"
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Write Comment *
-                  </label>
-                  <textarea
-                    onChange={handleCreateCommentChange}
-                    name="comment"
-                    value={createComment.comment}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    rows="4"
-                  />
-                </div>
-                <div>
-                  <button
-                    type="submit"
-                    className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-md shadow hover:bg-indigo-500 focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
-                  >
-                    Post comment <i className="fas fa-paper-plane ml-2"></i>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </main>
-      </div>
-
-      <Footer />
-    </section>
-  );
 };
 
 export default Detail;
