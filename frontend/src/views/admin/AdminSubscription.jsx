@@ -3,6 +3,8 @@ import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
 import apiInstance from "../../utils/axios";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+import { FiEye } from "react-icons/fi"; 
 
 const AdminSubscription = () => {
     const [subscriptions, setSubscriptions] = useState([]);
@@ -131,6 +133,13 @@ const AdminSubscription = () => {
                                                         ? "Expire"
                                                         : "Activate"}
                                                 </button>
+
+                                                <Link
+                                                    to={`/admin/subscriptions/${sub.id}/view`}
+                                                    className="px-4 py-2 ml-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg inline-block text-center"
+                                                >
+                                                    View
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}

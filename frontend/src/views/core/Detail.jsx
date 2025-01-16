@@ -176,6 +176,18 @@ const Detail = () => {
                             {post?.profile?.bio}
                         </p>
                     </div>
+                    <div className="mt-6 flex justify-center items-center gap-x-4">
+                        <button className="bg-white text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300">
+                            Follow
+                        </button>
+                        <Link
+                            to={`/chat/${post?.profile?.id}`}
+                            className="bg-white text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300"
+                        >
+                            Message
+                        </Link>
+                    </div>
+
                     <hr className="my-6" />
                     <div className="text-gray-700 space-y-3">
                         <p>

@@ -33,6 +33,8 @@ import Upgrade from "./views/payment/Upgrade";
 import PaymentSuccess from "./views/payment/PaymentSuccess";
 import PaymentCancel from "./views/payment/PaymentCancel";
 import Checkout from "./views/payment/Checkout";
+import ChatPage from "./views/chat/ChatPage";
+import AdminSubscriptionDetail from "./views/admin/AdminSubscriptionDetail";
 
 function App() {
     return (
@@ -166,6 +168,15 @@ function App() {
                     <Route
                         path="/admin/subscriptions"
                         element={<AdminSubscription />}
+                    />
+                    <Route
+                        path="/admin/subscriptions/:id/view"
+                        element={<AdminSubscriptionDetail />}
+                    />;
+
+                    <Route
+                        path="/chat/:profileId"
+                        element={<ChatPage />}
                     />
                 </Routes>
             </BrowserRouter>

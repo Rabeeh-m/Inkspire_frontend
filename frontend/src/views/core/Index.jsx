@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
 import { Link } from "react-router-dom";
-import useUserData from "../../plugin/useUserData";
 import Moment from "../../plugin/Moment";
 import apiInstance from "../../utils/axios";
 import DOMPurify from "dompurify"; // Import DOMPurify to sanitize HTML
 import Toast from "../../plugin/Toast";
+import Cookies from 'js-cookie';
 
 const Index = () => {
     const [posts, setPosts] = useState([]);
@@ -14,12 +14,13 @@ const Index = () => {
     const [category, setCategory] = useState([]);
     const [userProfiles, setUserProfiles] = useState([]);
 
-    const userId = useUserData()?.user_id;
+    const accessToken = Cookies.get('access_token');
 
     const fetchProfiles = async () => {
         try {
             const response_user = await apiInstance.get(
-                `user/profiles/${userId}/`
+                `user/profiles/`,
+                {headers: { Authorization: `Bearer ${accessToken}` },}
             );
             setUserProfiles(response_user.data);
         } catch (error) {
@@ -157,7 +158,7 @@ const Index = () => {
                                 key={post?.id}
                             >
                                 <Link to={post.slug}>
-                                    <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl hover:scale-105 transform transition-all">
+                                    <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl ">
                                         {/* Author Info */}
                                         <div className="flex items-center mb-4">
                                             <img
@@ -265,9 +266,7 @@ const Index = () => {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() =>
-                                            handleFollowToggle(profile.id)
-                                        }
+                                        
                                         className={`px-4 py-1 text-sm rounded ${
                                             profile.is_following
                                                 ? "bg-gray-300 text-gray-700 hover:bg-gray-400"

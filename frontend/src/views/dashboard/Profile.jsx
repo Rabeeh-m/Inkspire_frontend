@@ -107,6 +107,9 @@ function Profile() {
                                 <h2 className="text-2xl font-semibold mt-4">
                                     {profileData.full_name || "Full Name"}
                                 </h2>
+                                <p className="text-gray-600 text-md mt-2">
+                                    {profileData?.user?.email}
+                                </p>
                                 <p className="text-gray-600 text-sm mt-2">
                                     {profileData.bio || "Short Bio"}
                                 </p>
