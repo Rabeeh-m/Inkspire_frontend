@@ -121,40 +121,6 @@ const AdminSubscriptionDetail = () => {
             </ul>
           </div>
 
-          {/* Transaction History */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mt-8">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-              Transaction History
-            </h2>
-            {subscription.transactions && subscription.transactions.length > 0 ? (
-              <table className="w-full table-auto text-left text-sm text-gray-600">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 font-medium">Date</th>
-                    <th className="px-4 py-2 font-medium">Amount</th>
-                    <th className="px-4 py-2 font-medium">Payment Method</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subscription.transactions.map((transaction, index) => (
-                    <tr
-                      key={index}
-                      className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
-                    >
-                      <td className="px-4 py-2">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-2">${transaction.amount}</td>
-                      <td className="px-4 py-2">{transaction.method}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-gray-500">No transactions available.</p>
-            )}
-          </div>
-
           {/* Navigation Buttons */}
           <div className="mt-6 flex justify-end">
             <button

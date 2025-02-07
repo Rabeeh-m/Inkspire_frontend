@@ -20,9 +20,8 @@ const Checkout = () => {
                 }
             );
             if (data.success) {
-                // alert("Payment Successful! Your account is now upgraded.");
-                // Update the user status on the frontend or redirect to a confirmation page
-                navigate("/payment-success/");
+                // navigate("/payment-success/");
+                navigate("/payment-success/", { state: { invoice: data.invoice } });
             }
         } catch (error) {
             console.error("PayPal payment failed", error);

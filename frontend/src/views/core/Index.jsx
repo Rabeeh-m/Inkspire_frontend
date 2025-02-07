@@ -6,7 +6,7 @@ import Moment from "../../plugin/Moment";
 import apiInstance from "../../utils/axios";
 import DOMPurify from "dompurify"; // Import DOMPurify to sanitize HTML
 import Toast from "../../plugin/Toast";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const Index = () => {
     const [posts, setPosts] = useState([]);
@@ -14,14 +14,13 @@ const Index = () => {
     const [category, setCategory] = useState([]);
     const [userProfiles, setUserProfiles] = useState([]);
 
-    const accessToken = Cookies.get('access_token');
+    const accessToken = Cookies.get("access_token");
 
     const fetchProfiles = async () => {
         try {
-            const response_user = await apiInstance.get(
-                `user/profiles/`,
-                {headers: { Authorization: `Bearer ${accessToken}` },}
-            );
+            const response_user = await apiInstance.get(`user/profiles/`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
             setUserProfiles(response_user.data);
         } catch (error) {
             console.log(error);
@@ -65,6 +64,21 @@ const Index = () => {
         const truncatedContent =
             content.length > 100 ? content.slice(0, 300) + "..." : content;
         return DOMPurify.sanitize(truncatedContent);
+    };
+
+    const handleFollowToggle = async (profileId) => {
+        try {
+            const response = await apiInstance.post(
+                `profile/${profileId}/follow/`,
+                {},
+                { headers: { Authorization: `Bearer ${accessToken}` } }
+            );
+            Toast("success", response.data.detail);
+            fetchProfiles(); // Refresh profiles to reflect changes
+        } catch (error) {
+            console.error(error);
+            Toast("error", "An error occurred. Please try again.");
+        }
     };
 
     return (
@@ -222,51 +236,34 @@ const Index = () => {
                             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onChange={(e) => handleSearch(e)}
                         />
-                        {/* <ul className="space-y-2">
-                          {userProfiles?.map((userProfile, index) => (
-                            <li
-                              key={index}
-                              className="flex items-center justify-between bg-gray-50 p-3 rounded-lg shadow-sm hover:bg-gray-100 transition"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <img
-                                  src={userProfile.profile_image}
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                                <span className="font-medium text-gray-700">
-                                  {userProfile.full_name}
-                                </span>
-                              </div>
-                              <button className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 transition">
-                                Follow
-                              </button>
-                            </li>
-                          ))}
-                        </ul> */}
+
                         <div>
                             {userProfiles.map((profile) => (
                                 <div
                                     key={profile.id}
                                     className="flex items-center justify-between p-4 border-b"
                                 >
-                                    <div className="flex items-center">
-                                        <img
-                                            src={profile.profile_image}
-                                            alt="Profile"
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <div className="ml-3">
-                                            <h3 className="font-semibold">
-                                                {profile.full_name}
-                                            </h3>
-                                            <p className="text-sm text-gray-500">
-                                                {profile.bio}
-                                            </p>
+                                    <Link to={`/user/${profile?.user?.id}/`}>
+                                        <div className="flex items-center">
+                                            <img
+                                                src={profile.profile_image}
+                                                alt="Profile"
+                                                className="w-10 h-10 rounded-full object-cover"
+                                            />
+                                            <div className="ml-3">
+                                                <h3 className="font-semibold">
+                                                    {profile.full_name}
+                                                </h3>
+                                                <p className="text-sm text-gray-500">
+                                                    {profile.bio}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                     <button
-                                        
+                                        onClick={() =>
+                                            handleFollowToggle(profile.id)
+                                        }
                                         className={`px-4 py-1 text-sm rounded ${
                                             profile.is_following
                                                 ? "bg-gray-300 text-gray-700 hover:bg-gray-400"

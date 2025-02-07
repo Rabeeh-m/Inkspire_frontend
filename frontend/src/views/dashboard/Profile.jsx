@@ -42,8 +42,16 @@ function Profile() {
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
 
+        // Validate file size (less than 2MB)
         if (selectedFile && selectedFile.size > 2 * 1024 * 1024) {
             Toast("error", "File size must be less than 2MB", "");
+            return;
+        }
+
+        // Validate file type (only PNG and JPEG allowed)
+        const allowedTypes = ["image/png", "image/jpeg"];
+        if (selectedFile && !allowedTypes.includes(selectedFile.type)) {
+            Toast("error", "Only PNG and JPEG files are allowed", "");
             return;
         }
 

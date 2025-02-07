@@ -1,204 +1,43 @@
-// import React, { useState, useEffect } from "react";
-// import { useParams } from 'react-router-dom';
-// import { FaRegPaperPlane, FaSearch } from "react-icons/fa";
-// import Header from "../partials/Header";
-// import apiInstance from "../../utils/axios";
-// import Cookies from 'js-cookie';
 
-// const ChatPage = () => {
-//     const [messages, setMessages] = useState([
-//         { sender: "user", text: "Hey there!" },
-//         { sender: "admin", text: "Hello! How can I assist you?" },
-//     ]);
-//     const [message, setMessage] = useState("");
-
-//     const handleSendMessage = () => {
-//         if (message.trim()) {
-//             setMessages([...messages, { sender: "user", text: message }]);
-//             setMessage("");
-//         }
-//     };
-
-//     const [userProfiles, setUserProfiles] = useState([]);
-
-//     const accessToken = Cookies.get('access_token');
-
-//     const { profileId } = useParams(); 
-
-
-//     const fetchProfiles = async () => {
-//         try {
-//             const response_user = await apiInstance.get(
-//                 `user/profiles/`,
-//                 {headers: { Authorization: `Bearer ${accessToken}` },}
-//             );
-//             setUserProfiles(response_user.data);
-//         } catch (error) {
-//             console.log(error);
-//         }
-//     };
-
-//     useEffect(() => {
-//         fetchProfiles();
-//     }, []);
-
-//     const handleSearch = (e) => {
-//       const query = e.target.value.toLowerCase();
-//       if (query === "") {
-//           fetchProfiles();
-//       } else {
-//           const filtered = userProfiles.filter((p) =>
-//               p.full_name.toLowerCase().includes(query)
-//           );
-//           setUserProfiles(filtered);
-//       }
-//   };
-
-//     return (
-//         <>
-//             <Header />
-//             <div className="flex h-screen bg-gray-100">
-//                 {/* Sidebar */}
-//                 <div className="w-1/4 bg-white border-r border-gray-200 p-3">
-//                     {/* Search Input */}
-//                     <div className="flex items-center space-x-2">
-//                         <input
-//                             type="text"
-//                             placeholder="Search..."
-//                             className="p-1.5 rounded-md w-full bg-gray-200 text-sm text-gray-700 focus:outline-none"
-//                             onChange={(e) => handleSearch(e)}
-//                         />
-//                         <FaSearch className="text-gray-500 text-sm" />
-//                     </div>
-
-//                     {/* User Profiles */}
-//                     <div className="mt-3 space-y-2">
-//                         {userProfiles.map((profile) => (
-//                             <div
-//                                 key={profile.id} // Unique key for each profile
-//                                 className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer"
-//                             >
-//                                 {/* Profile Picture */}
-//                                 <div className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0 overflow-hidden">
-//                                     <img
-//                                         src={profile.profile_image}
-//                                         alt="Profile"
-//                                         className="w-full h-full object-cover"
-//                                     />
-//                                 </div>
-
-//                                 {/* Profile Details */}
-//                                 <div className="flex-1">
-//                                     <p className="font-medium text-sm text-gray-700">
-//                                         {profile.full_name}
-//                                     </p>
-//                                     <p className="text-green-700 text-xs">
-//                                     Online
-//                                     </p>
-//                                 </div>
-//                             </div>
-//                         ))}
-//                     </div>
-//                 </div>
-
-//                 {/* Chat Window */}
-//                 <div className="flex-1 flex flex-col bg-white">
-//                     {/* Header */}
-//                     <div className="flex items-center justify-between border-b p-3">
-//                     {userProfiles.map((profile) => (
-//                         profile.id == profileId && (
-//                         <div key={profile.id} className="flex items-center space-x-2">
-//                             <div className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0 overflow-hidden">
-//                                 <img
-//                                     src={profile.profile_image}
-//                                     alt="Profile"
-//                                     className="w-full h-full object-cover"
-//                                 />
-//                             </div>
-//                             <div>
-//                                 <p className="font-medium text-sm">{profile.full_name}</p>
-//                                 <p className="text-gray-500 text-xs">
-//                                     Active Now
-//                                 </p>
-//                             </div>
-//                         </div>
-//                         )
-//                         ))}
-//                     </div>
-
-//                     {/* Messages */}
-//                     <div className="flex-1 overflow-y-auto p-3 space-y-3">
-//                         {messages.map((msg, index) => (
-//                             <div
-//                                 key={index}
-//                                 className={`flex ${
-//                                     msg.sender === "user"
-//                                         ? "justify-end"
-//                                         : "justify-start"
-//                                 }`}
-//                             >
-//                                 <div
-//                                     className={`p-2.5 max-w-xs rounded-md text-sm text-white ${
-//                                         msg.sender === "user"
-//                                             ? "bg-blue-500"
-//                                             : "bg-gray-500"
-//                                     }`}
-//                                 >
-//                                     {msg.text}
-//                                 </div>
-//                             </div>
-//                         ))}
-//                     </div>
-
-//                     {/* Message Input */}
-//                     <div className="sticky bottom-0 bg-white border-t p-3">
-//                         <div className="flex items-center space-x-2">
-//                             <input
-//                                 type="text"
-//                                 value={message}
-//                                 onChange={(e) => setMessage(e.target.value)}
-//                                 placeholder="Type your message..."
-//                                 className="p-2 rounded-md w-full bg-gray-200 text-sm text-gray-700 focus:outline-none"
-//                             />
-//                             <button
-//                                 onClick={handleSendMessage}
-//                                 className="p-2 bg-blue-500 rounded-full"
-//                             >
-//                                 <FaRegPaperPlane className="text-white text-sm" />
-//                             </button>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </>
-//     );
-// };
-
-// export default ChatPage;
-
-
-// src/components/ChatPage.js
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from 'react-router-dom';
-import { FaRegPaperPlane } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { FaRegPaperPlane, FaVideo } from "react-icons/fa";
 import Header from "../partials/Header";
 import ChatSidebar from "./ChatSidebar";
 import apiInstance from "../../utils/axios";
 import Cookies from "js-cookie";
+import useUserData from "../../plugin/useUserData";
+import moment from "moment"; // ✅ Import for timestamps
 
 const ChatPage = () => {
-    const [messages, setMessages] = useState([
-        { sender: "user", text: "Hey there!" },
-        { sender: "admin", text: "Hello! How can I assist you?" },
-    ]);
     const [message, setMessage] = useState("");
-    // const [profileId, setProfileId] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [room, setRoom] = useState(null);
     const [userProfiles, setUserProfiles] = useState([]);
+    const [isAtBottom, setIsAtBottom] = useState(true); // ✅ Track if user is at the bottom
+    const ws = useRef(null);
+    const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
     const accessToken = Cookies.get("access_token");
-
     const { profileId } = useParams();
+    const userId = useUserData()?.user_id;
 
+    const sender_id = userId;
+    const receiver_id = Number(profileId) + 1;
+
+    // Fetch chat room and messages
+    const fetchRoomAndMessages = async () => {
+        try {
+            const response = await apiInstance.get(`chat-room/${sender_id}/${receiver_id}/`);
+            setRoom(response.data);
+            setMessages(response.data.messages);
+        } catch (error) {
+            console.error("Error fetching room and messages:", error);
+        }
+    };
+
+    // Fetch user profiles
     const fetchProfiles = async () => {
         try {
             const response_user = await apiInstance.get("user/profiles/", {
@@ -210,34 +49,102 @@ const ChatPage = () => {
         }
     };
 
+    // WebSocket setup
     useEffect(() => {
-        fetchProfiles();
-    }, []);
+        if (room?.id) {
+            ws.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${room.id}/`);
 
-    const handleSendMessage = () => {
-        if (message.trim()) {
-            setMessages([...messages, { sender: "user", text: message }]);
-            setMessage("");
+            ws.current.onopen = () => console.log("WebSocket connected");
+
+            ws.current.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data?.text) {
+                        setMessages((prevMessages) => [...prevMessages, data]); // Append new message
+                    }
+                } catch (error) {
+                    console.error("WebSocket message parsing error:", error);
+                }
+            };
+
+            ws.current.onerror = (error) => console.error("WebSocket error:", error);
+
+            ws.current.onclose = () => {
+                console.log("WebSocket disconnected, attempting to reconnect...");
+                setTimeout(() => fetchRoomAndMessages(), 3000);
+            };
+
+            return () => ws.current?.close();
+        }
+    }, [room]);
+
+    // Handle sending messages
+    const handleSendMessage = async () => {
+        if (message.trim() && room) {
+            const newMessage = {
+                sender: { id: sender_id },
+                text: message,
+                timestamp: new Date().toISOString(),
+                id: Date.now(),
+            };
+
+            setMessages((prevMessages) => [...prevMessages, newMessage]); // Optimistic update
+            setIsAtBottom(true); // ✅ Enable auto-scroll when sending
+
+            try {
+                await apiInstance.post("send-message/", {
+                    room_id: room.id,
+                    sender_id: sender_id,
+                    text: message,
+                });
+
+                if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                    ws.current.send(JSON.stringify(newMessage));
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+            }
+
+            setMessage(""); // Clear input field
         }
     };
 
-    const navigate = useNavigate();
+    // Auto-scroll only if user is at the bottom
+    useEffect(() => {
+        if (isAtBottom) {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
 
-    // Function to handle the profile click in the sidebar
-    const setProfileId = (id) => {
-        navigate(`/chat/${id}`); // Navigate to the selected profile's chat page
+    // Handle manual scrolling (Detect if user is at the bottom)
+    const handleScroll = () => {
+        if (chatContainerRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+            setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 10);
+        }
     };
+
+    // Handle pressing Enter to send a message
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault(); // Prevent new line
+            handleSendMessage();
+        }
+    };
+
+    // Fetch initial data
+    useEffect(() => {
+        fetchRoomAndMessages();
+        fetchProfiles();
+    }, [userId, profileId]);
 
     return (
         <>
             <Header />
             <div className="flex h-screen bg-gray-100">
-                {/* Sidebar */}
-                <ChatSidebar setProfileId={setProfileId} />
-
-                {/* Chat Window */}
+                <ChatSidebar setProfileId={profileId} />
                 <div className="flex-1 flex flex-col bg-white">
-                    {/* Header */}
+                    {/* Chat Header */}
                     <div className="flex items-center justify-between border-b p-3">
                         {userProfiles.map(
                             (profile) =>
@@ -252,47 +159,50 @@ const ChatPage = () => {
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">{profile.full_name}</p>
-                                            <p className="text-gray-500 text-xs">Active Now</p>
+                                            {/* <p className="text-gray-500 text-xs">Active Now</p> */}
                                         </div>
                                     </div>
                                 )
                         )}
+                        <Link to={'/vc-lobby'}>
+                            <FaVideo size={28} className="text-gray-700 hover:text-blue-500 cursor-pointer mr-8"/>
+                        </Link>
                     </div>
 
-                    {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                    {/* Chat Messages Container */}
+                    <div
+                        ref={chatContainerRef}
+                        onScroll={handleScroll} // ✅ Detect scrolling
+                        className="flex-1 overflow-y-auto p-3 space-y-3"
+                    >
                         {messages.map((msg, index) => (
                             <div
-                                key={index}
-                                className={`flex ${
-                                    msg.sender === "user" ? "justify-end" : "justify-start"
-                                }`}
+                                key={msg.id}
+                                ref={index === messages.length - 1 ? messagesEndRef : null}
+                                className={`flex ${msg.sender?.id === sender_id ? "justify-end" : "justify-start"}`}
                             >
-                                <div
-                                    className={`p-2.5 max-w-xs rounded-md text-sm text-white ${
-                                        msg.sender === "user" ? "bg-blue-500" : "bg-gray-500"
-                                    }`}
-                                >
-                                    {msg.text}
+                                <div className={`p-2 rounded-lg max-w-xs ${msg.sender?.id === sender_id ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
+                                    <p className="text-sm">{msg.text}</p>
+                                    <p className="text-xs text-gray-400 text-right">
+                                        {moment(msg.timestamp).format("hh:mm A")}
+                                    </p>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Message Input */}
+                    {/* Chat Input */}
                     <div className="sticky bottom-0 bg-white border-t p-3">
                         <div className="flex items-center space-x-2">
                             <input
                                 type="text"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
+                                onKeyDown={handleKeyPress}
                                 placeholder="Type your message..."
                                 className="p-2 rounded-md w-full bg-gray-200 text-sm text-gray-700 focus:outline-none"
                             />
-                            <button
-                                onClick={handleSendMessage}
-                                className="p-2 bg-blue-500 rounded-full"
-                            >
+                            <button onClick={handleSendMessage} className="p-2 bg-blue-500 rounded-full">
                                 <FaRegPaperPlane className="text-white text-sm" />
                             </button>
                         </div>
@@ -304,4 +214,3 @@ const ChatPage = () => {
 };
 
 export default ChatPage;
-

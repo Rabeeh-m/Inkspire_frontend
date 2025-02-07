@@ -35,6 +35,9 @@ import PaymentCancel from "./views/payment/PaymentCancel";
 import Checkout from "./views/payment/Checkout";
 import ChatPage from "./views/chat/ChatPage";
 import AdminSubscriptionDetail from "./views/admin/AdminSubscriptionDetail";
+import UserDetail from "./views/core/UserDetail";
+import VC_Lobby from "./views/chat/VC_Lobby";
+import VC_RoomPage from "./views/chat/VC_RoomPage";
 
 function App() {
     return (
@@ -133,6 +136,7 @@ function App() {
                     <Route path="/about/" element={<About />} />
                     <Route path="/contact/" element={<Contact />} />
                     <Route path="/upgrade/" element={<Upgrade />} />
+                    <Route path="/user/:userId/" element={<UserDetail />} />
                     <Route
                         path="/payment-success/"
                         element={<PaymentSuccess />}
@@ -177,6 +181,14 @@ function App() {
                     <Route
                         path="/chat/:profileId"
                         element={<ChatPage />}
+                    />
+                    <Route
+                        path="/vc-lobby"
+                        element={<VC_Lobby />}
+                    />
+                    <Route
+                        path="/vc-lobby/vc-room"
+                        element={<VC_RoomPage />}
                     />
                 </Routes>
             </BrowserRouter>

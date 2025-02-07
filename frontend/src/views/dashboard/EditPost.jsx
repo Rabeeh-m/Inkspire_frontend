@@ -71,6 +71,24 @@ function EditPost() {
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
+
+        if (selectedFile) {
+            // Check file type (e.g., image files only)
+            const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+            if (!allowedTypes.includes(selectedFile.type)) {
+                Toast("error", "Only image files (JPEG, PNG, GIF) are allowed.");
+                event.target.value = ""; // Reset file input
+                return;
+            }
+    
+            // Check file size (max 2MB)
+            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+            if (selectedFile.size > maxSize) {
+                Toast("error", "File size exceeds the 2MB limit.");
+                event.target.value = ""; // Reset file input
+                return;
+            }}
+
         const reader = new FileReader();
 
         setEditPost({
@@ -140,7 +158,7 @@ function EditPost() {
             <section className="pt-5 pb-5">
                 <div className="container mx-auto px-4">
                     <div className="mt-5">
-                        <div className="bg-blue-600 text-white rounded-lg p-6">
+                        <div className="bg-gradient-to-r from-black to-purple-800 text-white p-6 rounded-lg mb-8">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <h1 className="text-2xl font-bold">
@@ -187,6 +205,7 @@ function EditPost() {
                                         id="postThumbnail"
                                         className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                                         type="file"
+                                        accept="image/png, image/jpeg"
                                     />
                                 </div>
                                 <div className="mb-4">

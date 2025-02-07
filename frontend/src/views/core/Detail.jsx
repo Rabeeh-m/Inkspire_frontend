@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import apiInstance from "../../utils/axios";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
 import Moment, { timeAgo } from "../../plugin/Moment";
 import Toast from "../../plugin/Toast";
 import useUserData from "../../plugin/useUserData";
+import Swal from "sweetalert2";
 
 import {
     FaHeart,
@@ -22,13 +23,16 @@ const Detail = () => {
     const [bookmarked, setBookmarked] = useState(false);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
-
     const [replyContent, setReplyContent] = useState("");
     const [activeReply, setActiveReply] = useState(null);
+    const [users, setUsers] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    
+
 
     const param = useParams(); // Get post slug from URL
-
     const userId = useUserData()?.user_id;
+    const navigate = useNavigate();
 
     // Fetch Post and Comments
     const fetchPost = async () => {
@@ -144,8 +148,22 @@ const Detail = () => {
         }
     };
 
+    // Fetch users from API
+    const fetchUsers = async () => {
+        try {
+            const response = await apiInstance.get("admin/users-list/");
+            setUsers(response.data);
+            
+            const user = response.data.find((user) => user.id === userId);
+            setCurrentUser(user);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
+
     useEffect(() => {
         fetchPost();
+        fetchUsers();
     }, []);
 
     if (!post) {
@@ -155,6 +173,29 @@ const Detail = () => {
             </div>
         );
     }
+    // Handle Message Button Click
+    const handleMessageClick = () => {
+        if (currentUser?.is_premium) {
+            navigate(`/chat/${post?.profile?.id}`);
+        } else {
+            Swal.fire({
+                title: "Upgrade to Premium",
+                text: "Messaging is available only for premium members. Upgrade now to unlock this feature and more!",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "Go to Premium",
+                cancelButtonText: "Cancel",
+                customClass: {
+                    confirmButton: "bg-gradient-to-r from-black to-yellow-600 text-white px-4 py-2 rounded-md",
+                    cancelButton: "bg-gradient-to-r from-red-400 to-red-700 text-white px-4 py-2 rounded-md",
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/upgrade/");
+                }
+            });
+        }
+    };
 
     return (
         <section className="min-h-screen bg-gray-50">
@@ -177,15 +218,21 @@ const Detail = () => {
                         </p>
                     </div>
                     <div className="mt-6 flex justify-center items-center gap-x-4">
-                        <button className="bg-white text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300">
+                        {/* <button className="bg-white text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300">
                             Follow
-                        </button>
-                        <Link
+                        </button> */}
+                        {/* <Link
                             to={`/chat/${post?.profile?.id}`}
-                            className="bg-white text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300"
+                            className="bg-white w-full text-center text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300"
                         >
                             Message
-                        </Link>
+                        </Link> */}
+                        <button
+                            onClick={handleMessageClick}
+                            className="bg-white w-full text-center text-black font-bold py-2 px-4 rounded-lg shadow-md hover:bg-black hover:text-white border-2 border-gray-400 focus:outline-none transition duration-300"
+                        >
+                            Message
+                        </button>
                     </div>
 
                     <hr className="my-6" />

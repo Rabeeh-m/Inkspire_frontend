@@ -91,6 +91,24 @@ function AddPost() {
 
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
+
+        if (selectedFile) {
+            // Check file type (e.g., image files only)
+            const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+            if (!allowedTypes.includes(selectedFile.type)) {
+                Toast("error", "Only image files (JPEG, PNG, GIF) are allowed.");
+                event.target.value = ""; // Reset file input
+                return;
+            }
+    
+            // Check file size (max 2MB)
+            const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+            if (selectedFile.size > maxSize) {
+                Toast("error", "File size exceeds the 2MB limit.");
+                event.target.value = ""; // Reset file input
+                return;
+            }}
+
         const reader = new FileReader();
 
         setCreatePost({
@@ -154,10 +172,10 @@ function AddPost() {
             <Header />
             <section className="py-10">
                 <div className="container mx-auto px-4">
-                    <div className="bg-blue-600 text-white p-6 rounded-lg mb-8">
+                    <div className="bg-gradient-to-r from-black to-purple-800 text-white p-6 rounded-lg mb-8">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h1 className="text-2xl font-bold text-black">
+                                <h1 className="text-2xl font-bold text-whitw">
                                     Create Blog Post
                                 </h1>
                                 <p className="text-sm ">
@@ -204,6 +222,7 @@ function AddPost() {
                                         name="image"
                                         type="file"
                                         className="mt-2 block w-full  border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
+                                        accept="image/png, image/jpeg"
                                     />
                                 </div>
                                 <div>
