@@ -132,20 +132,95 @@ function App() {
                         }
                     />
 
-                    {/* Pages */}
-                    <Route path="/about/" element={<About />} />
-                    <Route path="/contact/" element={<Contact />} />
-                    <Route path="/upgrade/" element={<Upgrade />} />
-                    <Route path="/user/:userId/" element={<UserDetail />} />
+                    <Route
+                        path="/about/"
+                        element={
+                            <PrivateRoute>
+                                <About />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/contact/"
+                        element={
+                            <PrivateRoute>
+                                <Contact />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/upgrade/"
+                        element={
+                            <PrivateRoute>
+                                <Upgrade />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/user/:userId/"
+                        element={
+                            <PrivateRoute>
+                                <UserDetail />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/checkout/"
+                        element={
+                            <PrivateRoute>
+                                <Checkout />
+                            </PrivateRoute>
+                        }
+                    />
+
                     <Route
                         path="/payment-success/"
-                        element={<PaymentSuccess />}
+                        element={
+                            <PrivateRoute>
+                                <PaymentSuccess />
+                            </PrivateRoute>
+                        }
                     />
+
                     <Route
                         path="/payment-cancel/"
-                        element={<PaymentCancel />}
+                        element={
+                            <PrivateRoute>
+                                <PaymentCancel />
+                            </PrivateRoute>
+                        }
                     />
-                    <Route path="/checkout/" element={<Checkout />} />
+
+                    <Route
+                        path="/chat/:profileId"
+                        element={
+                            <PrivateRoute>
+                                <ChatPage />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/vc-lobby"
+                        element={
+                            <PrivateRoute>
+                                <VC_Lobby />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/vc-lobby/vc-room"
+                        element={
+                            <PrivateRoute>
+                                <VC_RoomPage />
+                            </PrivateRoute>
+                        }
+                    />
 
                     {/* Admin */}
                     <Route
@@ -178,18 +253,6 @@ function App() {
                         element={<AdminSubscriptionDetail />}
                     />;
 
-                    <Route
-                        path="/chat/:profileId"
-                        element={<ChatPage />}
-                    />
-                    <Route
-                        path="/vc-lobby"
-                        element={<VC_Lobby />}
-                    />
-                    <Route
-                        path="/vc-lobby/vc-room"
-                        element={<VC_RoomPage />}
-                    />
                 </Routes>
             </BrowserRouter>
         </>

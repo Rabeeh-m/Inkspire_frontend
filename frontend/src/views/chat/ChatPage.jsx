@@ -1,20 +1,22 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { FaRegPaperPlane, FaVideo } from "react-icons/fa";
+import { useParams, Link } from "react-router-dom";
+import { FaRegPaperPlane, FaVideo, FaPaperclip } from "react-icons/fa";
 import Header from "../partials/Header";
 import ChatSidebar from "./ChatSidebar";
 import apiInstance from "../../utils/axios";
 import Cookies from "js-cookie";
 import useUserData from "../../plugin/useUserData";
-import moment from "moment"; // ✅ Import for timestamps
+import moment from "moment";
 
 const ChatPage = () => {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const [room, setRoom] = useState(null);
     const [userProfiles, setUserProfiles] = useState([]);
-    const [isAtBottom, setIsAtBottom] = useState(true); // ✅ Track if user is at the bottom
+    const [file, setFile] = useState(null);
+    const [filePreview, setFilePreview] = useState(null); // State for file preview
+    const [isAtBottom, setIsAtBottom] = useState(true);
     const ws = useRef(null);
     const messagesEndRef = useRef(null);
     const chatContainerRef = useRef(null);
@@ -59,8 +61,8 @@ const ChatPage = () => {
             ws.current.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    if (data?.text) {
-                        setMessages((prevMessages) => [...prevMessages, data]); // Append new message
+                    if (data?.text || data?.file_url) {
+                        setMessages((prevMessages) => [...prevMessages, data]);
                     }
                 } catch (error) {
                     console.error("WebSocket message parsing error:", error);
@@ -71,41 +73,68 @@ const ChatPage = () => {
 
             ws.current.onclose = () => {
                 console.log("WebSocket disconnected, attempting to reconnect...");
-                setTimeout(() => fetchRoomAndMessages(), 3000);
+                setTimeout(() => fetchRoomAndMessages(), 1000);
             };
 
             return () => ws.current?.close();
         }
     }, [room]);
 
+    // Handle file input change
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const previewURL = URL.createObjectURL(selectedFile); // Generate temporary URL
+            setFilePreview(previewURL); // Set file preview URL
+            setFile(selectedFile); // Set file for sending
+        }
+    };
+
     // Handle sending messages
     const handleSendMessage = async () => {
-        if (message.trim() && room) {
-            const newMessage = {
-                sender: { id: sender_id },
-                text: message,
-                timestamp: new Date().toISOString(),
-                id: Date.now(),
-            };
-
-            setMessages((prevMessages) => [...prevMessages, newMessage]); // Optimistic update
-            setIsAtBottom(true); // ✅ Enable auto-scroll when sending
+        if ((message.trim() || file) && room) {
+            const formData = new FormData();
+            formData.append("room_id", room.id);
+            formData.append("sender_id", sender_id);
+            formData.append("text", message);
+            if (file) {
+                formData.append("file", file);
+            }
 
             try {
-                await apiInstance.post("send-message/", {
-                    room_id: room.id,
-                    sender_id: sender_id,
-                    text: message,
+                const response = await apiInstance.post("send-message/", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
                 });
 
+                // Optimistic update
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                        id: Date.now(), // Temporary ID for optimistic update
+                        sender: { id: sender_id },
+                        text: message,
+                        file_url: response.data.file,
+                        timestamp: new Date().toISOString(),
+                    },
+                ]);
+
                 if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-                    ws.current.send(JSON.stringify(newMessage));
+                    ws.current.send(JSON.stringify({
+                        id: Date.now(), // Temporary ID for WebSocket
+                        sender_id: sender_id,
+                        text: message,
+                        file_url: response.data.file,
+                        timestamp: new Date().toISOString(),
+                    }));
                 }
+
+                setMessage("");
+                setFile(null); // Clear file
+                setFilePreview(null); // Clear file preview
+                setIsAtBottom(true); // Enable auto-scroll
             } catch (error) {
                 console.error("Error sending message:", error);
             }
-
-            setMessage(""); // Clear input field
         }
     };
 
@@ -159,41 +188,103 @@ const ChatPage = () => {
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">{profile.full_name}</p>
-                                            {/* <p className="text-gray-500 text-xs">Active Now</p> */}
                                         </div>
                                     </div>
                                 )
                         )}
                         <Link to={'/vc-lobby'}>
-                            <FaVideo size={28} className="text-gray-700 hover:text-blue-500 cursor-pointer mr-8"/>
+                            <FaVideo size={28} className="text-gray-700 hover:text-blue-500 cursor-pointer mr-8" />
                         </Link>
                     </div>
 
                     {/* Chat Messages Container */}
                     <div
                         ref={chatContainerRef}
-                        onScroll={handleScroll} // ✅ Detect scrolling
+                        onScroll={handleScroll}
                         className="flex-1 overflow-y-auto p-3 space-y-3"
                     >
                         {messages.map((msg, index) => (
-                            <div
-                                key={msg.id}
-                                ref={index === messages.length - 1 ? messagesEndRef : null}
-                                className={`flex ${msg.sender?.id === sender_id ? "justify-end" : "justify-start"}`}
-                            >
-                                <div className={`p-2 rounded-lg max-w-xs ${msg.sender?.id === sender_id ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
-                                    <p className="text-sm">{msg.text}</p>
-                                    <p className="text-xs text-gray-400 text-right">
-                                        {moment(msg.timestamp).format("hh:mm A")}
-                                    </p>
-                                </div>
+                        <div
+                            key={msg.id || msg.timestamp} // Use a unique key
+                            ref={index === messages.length - 1 ? messagesEndRef : null}
+                            className={`flex ${msg.sender?.id === sender_id ? "justify-end" : "justify-start"}`}
+                        >
+                            <div className={`p-2 rounded-lg max-w-xs ${msg.sender?.id === sender_id ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
+                                {msg.file && (
+                                    <div className="mb-2">
+                                        {/* Handle image files */}
+                                        {msg.file.endsWith('.jpg') || msg.file.endsWith('.png') || msg.file.endsWith('.jpeg') || msg.file.endsWith('.gif') ? (
+                                            <img src={`http://127.0.0.1:8000${msg.file}`} alt="Media" className="w-full h-auto rounded" />
+                                        ) : msg.file.endsWith('.pdf') ? (
+                                            /* Handle PDF files */
+                                            <a 
+                                                href={`http://127.0.0.1:8000${msg.file}`} 
+                                                download 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-black underline"
+                                            >
+                                                {msg.file.split("/").pop()}
+                                            </a>
+                                        ) : (
+                                            /* Handle other file types */
+                                            <a 
+                                                href={`http://127.0.0.1:8000${msg.file}`} 
+                                                download 
+                                                className="text-black underline"
+                                            >
+                                                Download File
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
+                                {msg.text && <p className="text-sm">{msg.text}</p>}
+                                <p className="text-[10px] text-right">
+                                    {moment(msg.timestamp).format("hh:mm A")}
+                                </p>
                             </div>
-                        ))}
+                        </div>
+                    ))}
+
                     </div>
 
                     {/* Chat Input */}
                     <div className="sticky bottom-0 bg-white border-t p-3">
+                        {/* File Preview */}
+                        {filePreview && (
+                            <div className="mb-4 p-2 border rounded-lg">
+                                {file.type.startsWith('image/') ? (
+                                    <img src={filePreview} alt="File Preview" className="w-40 h-40 object-cover rounded" />
+                                ) : (
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-sm text-gray-700">File: {file.name}</span>
+                                        <a href={filePreview} download className="text-blue-500 underline">
+                                            Download Preview
+                                        </a>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        setFilePreview(null); // Clear preview
+                                        setFile(null); // Clear file
+                                    }}
+                                    className="mt-2 text-sm text-red-500 hover:text-red-700"
+                                >
+                                    Remove File
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Chat Input Field */}
                         <div className="flex items-center space-x-2">
+                            <label className="p-2 bg-gray-200 rounded-full cursor-pointer">
+                                <FaPaperclip className="text-gray-700" />
+                                <input
+                                    type="file"
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                />
+                            </label>
                             <input
                                 type="text"
                                 value={message}

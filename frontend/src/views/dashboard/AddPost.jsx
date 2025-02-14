@@ -271,7 +271,7 @@ function AddPost() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">
+                                    <label className="block text-sm font-medium text-gray-700 pt-10">
                                         Tags
                                     </label>
                                     <input
@@ -306,7 +306,7 @@ function AddPost() {
                             className={`w-full py-3 px-4 rounded-lg text-white font-semibold ${
                                 isLoading
                                     ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-green-500 hover:bg-green-600"
+                                    : "bg-green-600 hover:bg-green-700"
                             }`}
                             disabled={isLoading}
                         >

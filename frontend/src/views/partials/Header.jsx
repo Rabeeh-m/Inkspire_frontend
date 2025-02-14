@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import { clearUser } from "../../store/authSlice";
-import { FaCrown } from "react-icons/fa";
+import { FaCrown, FaUser, FaPlusCircle, FaBell, FaCog, FaSignOutAlt, FaUserPlus, FaSignInAlt, FaChevronDown, FaCogs } from "react-icons/fa";
+import { BiGrid, BiChat } from "react-icons/bi";
 import apiInstance from "../../utils/axios";
 import useUserData from "../../plugin/useUserData";
 
@@ -66,7 +67,7 @@ function Header() {
     };
 
     return (
-        <header className="bg-gray-800 text-white shadow-lg sticky top-0 z-50">
+        <header className="bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg sticky top-0 z-50">
             <nav className="container mx-auto px-4 py-3 flex justify-between items-center">
                 <Link to="/" className="flex items-center space-x-2">
                     <img
@@ -80,74 +81,74 @@ function Header() {
                     <div className="relative">
                         <button
                             onClick={toggleDropdown}
-                            className="hover:text-blue-400 flex items-center space-x-2"
+                            className="hover:text-blue-400 flex items-center space-x-2 transition duration-300 ease-in-out"
                         >
                             <span>Dashboard</span>
-                            <i className="bi bi-chevron-down"></i>
+                            <FaChevronDown className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                         </button>
                         {isOpen && (
-                            <div className="absolute top-full mt-2 bg-gray-700 text-white rounded shadow-lg min-w-[200px]">
+                            <div className="absolute top-full mt-2 bg-gray-900 text-white rounded-lg shadow-lg min-w-[200px] transform transition-all duration-300 ease-in-out">
                                 <ul className="py-2">
                                     <li>
                                         <Link
                                             to="/dashboard/"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="fas fa-user mr-2"></i>{" "}
+                                            <FaUser className="inline mr-2" />
                                             Dashboard
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/posts/"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="bi bi-grid-fill mr-2"></i>{" "}
+                                            <BiGrid className="inline mr-2" />
                                             Posts
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/add-post/"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="fas fa-plus-circle mr-2"></i>{" "}
+                                            <FaPlusCircle className="inline mr-2" />
                                             Add Post
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/comments/"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="bi bi-chat-left-quote-fill mr-2"></i>{" "}
+                                            <BiChat className="inline mr-2" />
                                             Comments
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/notifications/"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="fas fa-bell mr-2"></i>{" "}
+                                            <FaBell className="inline mr-2" />
                                             Notifications
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/profile/"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="fas fa-user-gear mr-2"></i>{" "}
+                                            <FaCog className="inline mr-2" />
                                             Profile
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
                                             to="/change-password"
-                                            className="block px-4 py-2 hover:bg-gray-600"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
                                         >
-                                            <i className="fas fa-user-gear mr-2"></i>{" "}
+                                            <FaCogs className="inline mr-2" />
                                             Change Password
                                         </Link>
                                     </li>
@@ -160,17 +161,17 @@ function Header() {
                         <div className="flex items-center space-x-4">
                             <Link
                                 to="/upgrade/"
-                                className="bg-gradient-to-r from-white to-yellow-500 text-black px-5 py-2 rounded-full flex items-center space-x-2 shadow-lg hover:opacity-90"
+                                className="bg-gradient-to-r from-white to-yellow-500 text-black px-5 py-2 rounded-full flex items-center space-x-2 shadow-lg hover:opacity-90 transition duration-300 ease-in-out"
                             >
-                                <FaCrown className="text-yellow-500" />
+                                <FaCrown className="text-yellow-700" />
                                 <span>Upgrade</span>
                             </Link>
                             <button
                                 onClick={handleLogout}
-                                className="bg-red-500 px-4 py-2 rounded-full hover:bg-red-700"
+                                className="bg-gradient-to-r from-red-500 to-red-700 px-4 py-2 rounded-full hover:opacity-90 transition duration-300 ease-in-out"
                             >
                                 Logout{" "}
-                                <i className="fas fa-sign-out-alt ml-2"></i>
+                                <FaSignOutAlt className="inline ml-2" />
                             </button>
                             <Link to="/profile/">
                                 <img
@@ -181,7 +182,7 @@ function Header() {
                                               "https://via.placeholder.com/40?text=No+Image"
                                     }
                                     alt="Profile"
-                                    className="h-10 w-10 rounded-full"
+                                    className="h-10 w-10 rounded-full border-2 border-white hover:border-blue-400 transition duration-300 ease-in-out"
                                 />
                             </Link>
                         </div>
@@ -189,17 +190,17 @@ function Header() {
                         <div className="flex items-center space-x-4">
                             <Link
                                 to="/register/"
-                                className="bg-green-500 px-4 py-2 rounded-full hover:bg-green-600"
+                                className="bg-gradient-to-r from-green-500 to-green-700 px-4 py-2 rounded-full hover:opacity-90 transition duration-300 ease-in-out"
                             >
                                 Register{" "}
-                                <i className="fas fa-user-plus ml-2"></i>
+                                <FaUserPlus className="inline ml-2" />
                             </Link>
                             <Link
                                 to="/login/"
-                                className="bg-blue-500 px-4 py-2 rounded-full hover:bg-blue-600"
+                                className="bg-gradient-to-r from-blue-500 to-blue-700 px-4 py-2 rounded-full hover:opacity-90 transition duration-300 ease-in-out"
                             >
                                 Login{" "}
-                                <i className="fas fa-sign-in-alt ml-2"></i>
+                                <FaSignInAlt className="inline ml-2" />
                             </Link>
                         </div>
                     )}
