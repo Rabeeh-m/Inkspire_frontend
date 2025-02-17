@@ -75,8 +75,20 @@ const Index = () => {
                 {},
                 { headers: { Authorization: `Bearer ${accessToken}` } }
             );
+    
+            // Update the local state instead of refetching all profiles
+            setUserProfiles((prevProfiles) =>
+                prevProfiles.map((profile) =>
+                    profile.id === profileId
+                        ? {
+                              ...profile,
+                              is_following: !profile.is_following, // Toggle follow status
+                          }
+                        : profile
+                )
+            );
+    
             Toast("success", response.data.detail);
-            fetchProfiles(); // Refresh profiles to reflect changes
         } catch (error) {
             console.error(error);
             Toast("error", "An error occurred. Please try again.");
