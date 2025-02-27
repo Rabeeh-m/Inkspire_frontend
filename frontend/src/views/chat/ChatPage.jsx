@@ -333,10 +333,12 @@ const ChatPage = () => {
     const { profileId } = useParams();
     const userId = useUserData()?.user_id;
 
-    const sender_id = userId;
-    const receiver_id = Number(profileId) + 1;
-
     const isDevelopment = import.meta.env.MODE === 'development';
+
+    const sender_id = userId;
+    // const receiver_id = Number(profileId) + 1;
+    const receiver_id = isDevelopment ? Number(profileId) + 1 : Number(profileId);
+
     const BaseUrl = isDevelopment ? import.meta.env.VITE_LOCAL_BASEURL : import.meta.env.VITE_DEPLOY_BASEURL;
 
     // Fetch chat room and messages
