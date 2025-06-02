@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import { clearUser } from "../../store/authSlice";
 import { FaCrown, FaUser, FaPlusCircle, FaBell, FaCog, FaSignOutAlt, FaUserPlus, FaSignInAlt, FaChevronDown, FaCogs } from "react-icons/fa";
 import { BiGrid, BiChat } from "react-icons/bi";
+import { MdCategory } from "react-icons/md";
 import apiInstance from "../../utils/axios";
 import useUserData from "../../plugin/useUserData";
 
@@ -114,6 +115,15 @@ function Header() {
                                         >
                                             <FaPlusCircle className="inline mr-2" />
                                             Add Post
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/categories/"
+                                            className="block px-4 py-2 hover:bg-gray-600 transition duration-300 ease-in-out"
+                                        >
+                                            <MdCategory className="inline mr-2" />
+                                            Categories
                                         </Link>
                                     </li>
                                     <li>

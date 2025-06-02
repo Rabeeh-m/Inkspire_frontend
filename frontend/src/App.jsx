@@ -38,6 +38,7 @@ import AdminSubscriptionDetail from "./views/admin/AdminSubscriptionDetail";
 import UserDetail from "./views/core/UserDetail";
 import VC_Lobby from "./views/chat/VC_Lobby";
 import VC_RoomPage from "./views/chat/VC_RoomPage";
+import Categories from "./views/dashboard/Categories";
 
 function App() {
     return (
@@ -110,6 +111,15 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Comments />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/categories/"
+                        element={
+                            <PrivateRoute>
+                                <Categories />
                             </PrivateRoute>
                         }
                     />

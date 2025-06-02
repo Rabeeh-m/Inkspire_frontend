@@ -371,7 +371,6 @@ const ChatPage = () => {
             ws.current = new WebSocket(wsUrl);
 
             ws.current.onopen = () => console.log("WebSocket connected");
-
             ws.current.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
